@@ -35,7 +35,7 @@ async function readJsonFile(filePath, fallbackValue) {
 
 async function writeJsonFile(filePath, data) {
   await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
-  const temporaryFile = `${filePath}.${process.pid}.tmp`;
+  const temporaryFile = `${filePath}.${process.pid}.${crypto.randomBytes(8).toString('hex')}.tmp`;
   await fs.promises.writeFile(temporaryFile, JSON.stringify(data, null, 2), { encoding: 'utf8', mode: 0o600 });
   await fs.promises.rename(temporaryFile, filePath);
 }

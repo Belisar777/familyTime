@@ -1,0 +1,160 @@
+{
+  "events": [
+    {
+      "id": 1,
+      "title": "Ranní porada",
+      "member": "jan",
+      "date": "2026-08-26",
+      "time": "07:30",
+      "location": "Online",
+      "reminderMinutes": 30
+    },
+    {
+      "id": 2,
+      "title": "Zubař",
+      "member": "petra",
+      "date": "2026-08-26",
+      "time": "10:00",
+      "location": "Poliklinika Vinohrady",
+      "reminderMinutes": 30
+    },
+    {
+      "id": 3,
+      "title": "Vyzvednout Elišku",
+      "member": "jan",
+      "date": "2026-08-26",
+      "time": "15:30",
+      "location": "Základní škola",
+      "reminderMinutes": 30
+    },
+    {
+      "id": 4,
+      "title": "Klavír",
+      "member": "eliska",
+      "date": "2026-08-26",
+      "time": "16:30",
+      "location": "ZUŠ",
+      "reminderMinutes": 30
+    },
+    {
+      "id": 5,
+      "title": "Fotbalový trénink",
+      "member": "tomas",
+      "date": "2026-08-26",
+      "time": "17:00",
+      "location": "SK Meteor",
+      "reminderMinutes": 30
+    },
+    {
+      "id": 1787724787575,
+      "title": "Cvičení",
+      "member": "petra",
+      "date": "2026-08-26",
+      "time": "16:00",
+      "location": "Doma",
+      "reminderMinutes": 30
+    },
+    {
+      "id": 1787751555770,
+      "title": "PEs",
+      "member": "eliska",
+      "date": "2026-08-11",
+      "time": "16:00",
+      "location": "Doma",
+      "reminderMinutes": 30
+    }
+  ],
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Objednat Tomáše k lékaři",
+      "member": "petra",
+      "dueDate": "2026-08-26",
+      "completed": true
+    },
+    {
+      "id": 2,
+      "title": "Vynést tříděný odpad",
+      "member": "tomas",
+      "dueDate": "2026-08-26",
+      "completed": true
+    },
+    {
+      "id": 3,
+      "title": "Koupit věci na snídani",
+      "member": "jan",
+      "dueDate": "2026-08-26",
+      "completed": true
+    },
+    {
+      "id": 4,
+      "title": "Potvrdit školní výlet",
+      "member": "petra",
+      "dueDate": "2026-08-26",
+      "completed": true
+    },
+    {
+      "id": 5,
+      "title": "Zalít bylinky",
+      "member": "eliska",
+      "dueDate": "2026-08-26",
+      "completed": true
+    }
+  ],
+  "members": {
+    "jan": {
+      "name": "Stanislav Šec",
+      "shortName": "Stanislav",
+      "initial": "S",
+      "role": "Správce rodiny",
+      "color": 0
+    },
+    "petra": {
+      "name": "Zdislava Šecová",
+      "shortName": "Zdislava",
+      "initial": "Z",
+      "role": "Rodič",
+      "color": 1
+    },
+    "eliska": {
+      "name": "Magdaléna Šecová",
+      "shortName": "Magdaléna",
+      "initial": "M",
+      "role": "Dítě",
+      "color": 2
+    },
+    "tomas": {
+      "name": "Mariana Čechová",
+      "shortName": "Mariana",
+      "initial": "M",
+      "role": "Prarodič",
+      "color": 3
+    },
+    "member-cbc98e21-33f3-4b04-941c-1afea70bcf75": {
+      "name": "Jakub Šec",
+      "shortName": "Jakub",
+      "initial": "J",
+      "role": "Dítě",
+      "color": 4
+    },
+    "member-d47a2e00-3ab2-4176-ba75-d89a6dd91995": {
+      "name": "Daniel Šec",
+      "shortName": "Daniel",
+      "initial": "D",
+      "role": "Dítě",
+      "color": 5
+    },
+    "member-f61e3ca5-7c3a-4dbe-8334-4c3397bf46c1": {
+      "name": "Ondřej Šec",
+      "shortName": "Ondřej",
+      "initial": "O",
+      "role": "Dítě",
+      "color": 0
+    }
+  },
+  "settings": {
+    "householdName": "Rodina Šecových",
+    "city": "Plzeň"
+  },
+  "updatedAt": "2026-08-26T17:38:11.595Z"
+}

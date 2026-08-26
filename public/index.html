@@ -65,10 +65,12 @@
         <button class="icon-label-button" type="button" id="settings-button">
           <svg aria-hidden="true"><use href="#icon-settings"></use></svg><span>Nastavení</span>
         </button>
-        <div class="user-card">
+        <button class="icon-label-button sidebar-logout-button" type="button" id="sidebar-logout-button">
+          <svg aria-hidden="true"><use href="#icon-logout"></use></svg><span>Odhlásit se</span>
+        </button>
+        <div class="user-card" id="user-card" role="button" tabindex="0" aria-label="Otevřít nastavení účtu">
           <span class="avatar avatar--photo" id="signed-user-avatar">JS</span>
           <span><strong id="signed-user-name">Jan Svoboda</strong><small id="signed-user-role">Správce rodiny</small></span>
-          <button type="button" aria-label="Otevřít uživatelské menu">•••</button>
         </div>
       </div>
     </aside>
@@ -83,6 +85,7 @@
           <button class="round-button" id="notification-button" type="button" aria-label="Oznámení">
             <svg aria-hidden="true"><use href="#icon-bell"></use></svg><span class="notification-dot"></span>
           </button>
+          <button class="round-button mobile-user-button" id="mobile-user-button" type="button" aria-label="Účet a odhlášení"><span class="avatar avatar--photo" id="mobile-user-avatar">JS</span></button>
           <button class="primary-button" id="add-event-button" type="button">
             <svg aria-hidden="true"><use href="#icon-plus"></use></svg><span>Přidat aktivitu</span>
           </button>
@@ -269,6 +272,7 @@
     <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
     <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></symbol>
     <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="icon-logout" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5M15 12H3M14 3h6a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-6"/></symbol>
   </svg>
   <script src="app.js"></script>
 </body>

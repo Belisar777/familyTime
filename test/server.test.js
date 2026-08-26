@@ -55,9 +55,22 @@ test('registruje domácnost, ukládá data a poskytuje kalendář', async () => 
   assert.equal(familyResponse.status, 200);
   assert.deepEqual(await familyResponse.json(), sampleData);
 
-  const changedData = { ...sampleData, settings: { ...sampleData.settings, city: 'Brno' } };
+  const changedData = {
+    ...sampleData,
+    members: {
+      ...sampleData.members,
+      petra: { name: 'Petra Testovací', shortName: 'Petra', initial: 'P', role: 'Rodič', color: 1 },
+      eliska: { name: 'Eliška Testovací', shortName: 'Eliška', initial: 'E', role: 'Dítě', color: 2 },
+      tomas: { name: 'Tomáš Testovací', shortName: 'Tomáš', initial: 'T', role: 'Dítě', color: 3 },
+      'member-five': { name: 'Anna Testovací', shortName: 'Anna', initial: 'A', role: 'Prarodič', color: 4 },
+      'member-six': { name: 'Pavel Testovací', shortName: 'Pavel', initial: 'P', role: 'Pečující osoba', color: 5 }
+    },
+    settings: { ...sampleData.settings, city: 'Brno' }
+  };
   const saveResponse = await fetch(`${baseUrl}/api/family-data`, { method: 'PUT', headers: { Cookie: cookie, 'Content-Type': 'application/json' }, body: JSON.stringify(changedData) });
   assert.equal(saveResponse.status, 200);
+  const membersAfterSave = await fetch(`${baseUrl}/api/family-data`, { headers: { Cookie: cookie } });
+  assert.equal(Object.keys((await membersAfterSave.json()).members).length, 6);
 
   const invitationResponse = await fetch(`${baseUrl}/api/invitations`, { method: 'POST', headers: { Cookie: cookie, 'Content-Type': 'application/json' }, body: JSON.stringify({ memberId: 'jan' }) });
   assert.equal(invitationResponse.status, 201);
