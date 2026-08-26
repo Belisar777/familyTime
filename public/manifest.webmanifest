@@ -1,0 +1,19 @@
+{
+  "name": "FamilyTimes – rodinný plán",
+  "short_name": "FamilyTimes",
+  "description": "Méně chaosu v rodině. Více času pro sebe.",
+  "lang": "cs",
+  "start_url": "/#today",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f5f3ed",
+  "theme_color": "#346653",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

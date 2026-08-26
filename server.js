@@ -13,6 +13,7 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon',
   '.js': 'text/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
+  '.webmanifest': 'application/manifest+json; charset=utf-8',
   '.svg': 'image/svg+xml'
 };
 
@@ -32,6 +33,41 @@ function sendFile(response, filePath) {
 function sendJson(response, statusCode, data) {
   response.writeHead(statusCode, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
   response.end(data === undefined ? '' : JSON.stringify(data));
+}
+
+function escapeCalendarText(value) {
+  return String(value || '').replace(/\\/g, '\\\\').replace(/\r?\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;');
+}
+
+function formatCalendarDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${year}${month}${day}T${hours}${minutes}00`;
+}
+
+async function sendCalendarFeed(response, memberKey) {
+  try {
+    let familyData = { events: [], members: {}, settings: { householdName: 'FamilyTimes' } };
+    try { familyData = JSON.parse(await fs.promises.readFile(FAMILY_DATA_FILE, 'utf8')); } catch (error) { if (error.code !== 'ENOENT') throw error; }
+    const events = (familyData.events || []).filter((event) => !memberKey || memberKey === 'all' || event.member === memberKey);
+    const calendarName = memberKey && memberKey !== 'all' && familyData.members[memberKey] ? `${familyData.members[memberKey].name} · FamilyTimes` : familyData.settings.householdName;
+    const calendarLines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//FamilyTimes//Rodinny kalendar//CS', 'CALSCALE:GREGORIAN', `X-WR-CALNAME:${escapeCalendarText(calendarName)}`];
+    events.forEach((event) => {
+      const eventStart = new Date(`${event.date}T${event.time}:00`);
+      const eventEnd = new Date(eventStart.getTime() + 60 * 60 * 1000);
+      const member = familyData.members[event.member];
+      calendarLines.push('BEGIN:VEVENT', `UID:${event.id}@familytimes`, `DTSTAMP:${formatCalendarDate(new Date())}`, `DTSTART:${formatCalendarDate(eventStart)}`, `DTEND:${formatCalendarDate(eventEnd)}`, `SUMMARY:${escapeCalendarText(event.title)}`, `LOCATION:${escapeCalendarText(event.location)}`, `DESCRIPTION:${escapeCalendarText(member ? `Člen rodiny: ${member.name}` : '')}`, 'END:VEVENT');
+    });
+    calendarLines.push('END:VCALENDAR');
+    response.writeHead(200, { 'Content-Type': 'text/calendar; charset=utf-8', 'Content-Disposition': 'inline; filename="familytimes.ics"', 'Cache-Control': 'no-cache' });
+    response.end(`${calendarLines.join('\r\n')}\r\n`);
+  } catch {
+    response.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
+    response.end('Kalendář se nepodařilo vytvořit.');
+  }
 }
 
 async function handleApiRequest(request, response) {
@@ -86,6 +122,10 @@ async function handleApiRequest(request, response) {
 
 function handleRequest(request, response) {
   const requestUrl = new URL(request.url, `http://${request.headers.host}`);
+  if (requestUrl.pathname === '/calendar.ics' && request.method === 'GET') {
+    sendCalendarFeed(response, requestUrl.searchParams.get('member'));
+    return;
+  }
   if (requestUrl.pathname === '/api/family-data') {
     handleApiRequest(request, response);
     return;

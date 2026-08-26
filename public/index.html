@@ -5,7 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#f7f5ef">
   <meta name="description" content="FamilyTimes – méně chaosu v rodině, více času pro sebe.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>FamilyTimes</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -211,6 +215,13 @@
         <div class="data-tools__actions"><button class="secondary-button" type="button" id="export-data-button">Stáhnout zálohu</button><button class="secondary-button" type="button" id="import-data-button">Obnovit ze souboru</button></div>
         <input id="import-data-input" type="file" accept="application/json,.json" hidden>
       </div>
+      <div class="calendar-sync-card">
+        <div><strong>Kalendář Google, Apple a Outlook</strong><small>Zkopírujte odkaz pro odběr nebo stáhněte aktuální kalendář jako soubor .ics.</small></div>
+        <label>Čí kalendář<select id="calendar-member-select" name="calendarMember"><option value="all">Celá rodina</option></select></label>
+        <div class="calendar-link"><input id="calendar-feed-url" type="url" readonly aria-label="Odkaz na kalendář"><button type="button" id="copy-calendar-link">Kopírovat</button></div>
+        <button class="secondary-button" type="button" id="download-calendar-button">Stáhnout .ics</button>
+      </div>
+      <div class="install-card" id="install-card" hidden><div><strong>Nainstalovat FamilyTimes</strong><small>Přidejte aplikaci na plochu a otevírejte ji jako běžnou aplikaci.</small></div><button class="secondary-button" type="button" id="install-app-button">Nainstalovat</button></div>
       <div class="dialog-actions"><button class="secondary-button" type="button" id="cancel-settings-dialog">Zrušit</button><button class="primary-button" type="submit">Uložit nastavení</button></div>
     </form>
   </dialog>

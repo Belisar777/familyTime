@@ -5,7 +5,7 @@
   "description": "Rodinný organizační systém FamilyTimes",
   "scripts": {
     "start": "node server.js",
-    "check": "node --check server.js && node --check public/app.js"
+    "check": "node --check server.js && node --check public/app.js && node --check public/service-worker.js"
   },
   "engines": {
     "node": ">=18"

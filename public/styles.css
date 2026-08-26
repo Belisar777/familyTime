@@ -195,6 +195,8 @@ h2 { font-size: 20px; letter-spacing: -.5px; }
 .print-member-field { display: none !important; }.print-member-field--visible { display: grid !important; }
 .print-report { display: none; }
 .data-tools { display: grid; gap: 14px; margin-top: 22px; padding: 17px; border-radius: 14px; background: var(--surface-soft); }.data-tools strong, .data-tools small { display: block; }.data-tools strong { font-size: 12px; }.data-tools small { margin-top: 5px; color: var(--muted-color); font-size: 10px; line-height: 1.5; }.data-tools__actions { display: flex; gap: 8px; }.data-tools__actions button { min-height: 38px; padding-inline: 12px; font-size: 10px; }
+.install-card { align-items: center; justify-content: space-between; gap: 15px; margin-top: 12px; padding: 15px 17px; border: 1px solid #cfdfd2; border-radius: 14px; background: #f2f7f1; }.install-card:not([hidden]) { display: flex; }.install-card strong, .install-card small { display: block; }.install-card strong { font-size: 12px; }.install-card small { max-width: 300px; margin-top: 4px; color: var(--muted-color); font-size: 10px; line-height: 1.4; }.install-card button { flex: 0 0 auto; }
+.calendar-sync-card { display: grid; grid-template-columns: 1fr 150px; gap: 12px 15px; margin-top: 12px; padding: 17px; border: 1px solid var(--border-color); border-radius: 14px; }.calendar-sync-card > div:first-child strong, .calendar-sync-card > div:first-child small { display: block; }.calendar-sync-card > div:first-child strong { font-size: 12px; }.calendar-sync-card > div:first-child small { margin-top: 5px; color: var(--muted-color); font-size: 10px; line-height: 1.45; }.calendar-sync-card label { margin: 0; }.calendar-sync-card select { min-height: 38px; }.calendar-link { display: flex; min-width: 0; grid-column: 1 / -1; }.calendar-link input { min-width: 0; min-height: 39px; flex: 1; padding: 0 11px; border: 1px solid var(--border-color); border-radius: 10px 0 0 10px; background: #f8f8f5; color: var(--muted-color); font-size: 9px; }.calendar-link button { padding: 0 12px; border: 0; border-radius: 0 10px 10px 0; background: var(--primary-color); color: white; cursor: pointer; font-size: 10px; font-weight: 700; }.calendar-sync-card > .secondary-button { min-height: 38px; width: max-content; padding-inline: 12px; font-size: 10px; }
 
 @media (max-width: 1100px) {
   :root { --sidebar-width: 84px; }
@@ -226,6 +228,8 @@ h2 { font-size: 20px; letter-spacing: -.5px; }
   .form-row { grid-template-columns: 1fr; }.dialog-actions { display: grid; grid-template-columns: 1fr 1fr; }.dialog-actions--spread { grid-template-columns: 1fr 1fr; }.dialog-actions--spread > span { display: none; }
   .view-toolbar { align-items: flex-start; }.task-filters { overflow-x: auto; }.month-day { min-height: 67px; }.calendar-event { width: 7px; height: 7px; padding: 0; border-radius: 50%; color: transparent; }.calendar-weekdays span { padding-inline: 3px; }.family-grid { grid-template-columns: 1fr; }.full-task { grid-template-columns: 26px 1fr auto; }.full-task__due { display: none; }.household-card { align-items: flex-start; gap: 10px; }.status-badge { max-width: 95px; text-align: center; }
   .data-tools__actions { display: grid; }
+  .install-card:not([hidden]) { align-items: stretch; flex-direction: column; }
+  .calendar-sync-card { grid-template-columns: 1fr; }.calendar-link { grid-column: auto; }
 }
 
 @media print {
