@@ -139,9 +139,9 @@
       </section>
 
       <section class="app-view app-view--hidden content-panel" id="family-view" data-page="family">
-        <div class="view-toolbar"><div><p class="eyebrow">DOMÁCNOST</p><h2>Rodina Svobodových</h2></div><button class="secondary-button" id="invite-member-button" type="button"><svg aria-hidden="true"><use href="#icon-plus"></use></svg>Pozvat člena</button></div>
+        <div class="view-toolbar"><div><p class="eyebrow">DOMÁCNOST</p><h2 id="household-title">Rodina Svobodových</h2></div><button class="secondary-button" id="invite-member-button" type="button"><svg aria-hidden="true"><use href="#icon-plus"></use></svg>Pozvat člena</button></div>
         <div class="family-grid" id="family-grid"></div>
-        <article class="household-card"><div><span class="household-card__icon">⌂</span><div><strong>Domov</strong><small>Praha · 4 členové</small></div></div><span class="status-badge">Vše synchronizováno</span></article>
+        <article class="household-card"><div><span class="household-card__icon">⌂</span><div><strong>Domov</strong><small id="household-summary">Praha · 4 členové</small></div></div><span class="status-badge" id="sync-status">Místní kopie</span></article>
       </section>
     </main>
   </div>
@@ -178,6 +178,44 @@
       <div class="dialog-actions"><button class="secondary-button" type="button" id="cancel-task-dialog">Zrušit</button><button class="primary-button" type="submit">Uložit úkol</button></div>
     </form>
   </dialog>
+
+  <dialog class="activity-dialog print-dialog" id="print-dialog">
+    <form method="dialog" id="print-form">
+      <div class="dialog-heading"><div><p class="eyebrow">TISKOVÁ SESTAVA</p><h2>Co chcete vytisknout?</h2></div><button type="button" id="close-print-dialog" aria-label="Zavřít">×</button></div>
+      <fieldset class="report-options">
+        <label class="report-option"><input type="radio" name="reportType" value="day" checked><span><strong>Denní harmonogram</strong><small>Aktivity a úkoly vybraného dne</small></span></label>
+        <label class="report-option"><input type="radio" name="reportType" value="week"><span><strong>Týdenní plán rodiny</strong><small>Kompletní přehled na sedm dní</small></span></label>
+        <label class="report-option"><input type="radio" name="reportType" value="member"><span><strong>Přehled člena</strong><small>Osobní aktivity a povinnosti</small></span></label>
+      </fieldset>
+      <label class="print-member-field" id="print-member-field">Člen rodiny<select name="member"><option value="jan">Jan</option><option value="petra">Petra</option><option value="eliska">Eliška</option><option value="tomas">Tomáš</option></select></label>
+      <div class="dialog-actions"><button class="secondary-button" type="button" id="cancel-print-dialog">Zrušit</button><button class="primary-button" type="submit"><svg aria-hidden="true"><use href="#icon-print"></use></svg>Vytvořit sestavu</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="activity-dialog" id="member-dialog">
+    <form method="dialog" id="member-form">
+      <div class="dialog-heading"><div><p class="eyebrow">NOVÝ ČLEN</p><h2>Přidat do rodiny</h2></div><button type="button" id="close-member-dialog" aria-label="Zavřít">×</button></div>
+      <label>Jméno a příjmení<input name="name" required maxlength="60" placeholder="Např. Anna Svobodová"></label>
+      <label>Role<select name="role"><option value="Rodič">Rodič</option><option value="Dítě">Dítě</option><option value="Prarodič">Prarodič</option><option value="Pečující osoba">Pečující osoba</option></select></label>
+      <div class="dialog-actions"><button class="secondary-button" type="button" id="cancel-member-dialog">Zrušit</button><button class="primary-button" type="submit">Přidat člena</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="activity-dialog settings-dialog" id="settings-dialog">
+    <form method="dialog" id="settings-form">
+      <div class="dialog-heading"><div><p class="eyebrow">NASTAVENÍ</p><h2>Vaše domácnost</h2></div><button type="button" id="close-settings-dialog" aria-label="Zavřít">×</button></div>
+      <label>Název domácnosti<input name="householdName" required maxlength="60" placeholder="Např. Rodina Svobodových"></label>
+      <label>Město<input name="city" maxlength="60" placeholder="Např. Praha"></label>
+      <div class="data-tools">
+        <div><strong>Záloha rodinných dat</strong><small>Stáhněte si aktivity, úkoly a členy do jednoho souboru.</small></div>
+        <div class="data-tools__actions"><button class="secondary-button" type="button" id="export-data-button">Stáhnout zálohu</button><button class="secondary-button" type="button" id="import-data-button">Obnovit ze souboru</button></div>
+        <input id="import-data-input" type="file" accept="application/json,.json" hidden>
+      </div>
+      <div class="dialog-actions"><button class="secondary-button" type="button" id="cancel-settings-dialog">Zrušit</button><button class="primary-button" type="submit">Uložit nastavení</button></div>
+    </form>
+  </dialog>
+
+  <section class="print-report" id="print-report" aria-hidden="true"></section>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
