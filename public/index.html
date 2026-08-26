@@ -62,7 +62,7 @@
         </div>
       </header>
 
-      <section class="summary-grid" aria-label="Souhrn dne">
+      <section class="summary-grid app-view" id="today-summary" data-page="today" aria-label="Souhrn dne">
         <article class="summary-card summary-card--hero">
           <div class="summary-card__icon"><svg aria-hidden="true"><use href="#icon-sun"></use></svg></div>
           <div><p>Dnešní den</p><strong>5 aktivit</strong><small>První v 7:30</small></div>
@@ -79,7 +79,7 @@
         </article>
       </section>
 
-      <section class="planner-layout">
+      <section class="planner-layout app-view" id="today-view" data-page="today">
         <div class="schedule-panel">
           <div class="section-heading">
             <div><p class="eyebrow">RODINNÝ PŘEHLED</p><h2>Tento týden</h2></div>
@@ -119,6 +119,30 @@
           </article>
         </aside>
       </section>
+
+      <section class="app-view app-view--hidden content-panel" id="calendar-view" data-page="calendar">
+        <div class="view-toolbar">
+          <div><p class="eyebrow">SPOLEČNÝ ČAS</p><h2 id="month-title">Srpen 2026</h2></div>
+          <div class="week-controls"><button type="button" id="previous-month" aria-label="Předchozí měsíc">‹</button><button type="button" id="current-month">Dnes</button><button type="button" id="next-month" aria-label="Další měsíc">›</button></div>
+        </div>
+        <div class="calendar-weekdays" aria-hidden="true"><span>Po</span><span>Út</span><span>St</span><span>Čt</span><span>Pá</span><span>So</span><span>Ne</span></div>
+        <div class="month-grid" id="month-grid" aria-label="Měsíční kalendář"></div>
+      </section>
+
+      <section class="app-view app-view--hidden content-panel" id="tasks-view" data-page="tasks">
+        <div class="view-toolbar">
+          <div><p class="eyebrow">ODPOVĚDNOSTI</p><h2>Všechny rodinné úkoly</h2></div>
+          <div class="task-filters" id="task-filters"><button class="task-filter task-filter--active" type="button" data-task-filter="open">Čekají</button><button class="task-filter" type="button" data-task-filter="all">Všechny</button><button class="task-filter" type="button" data-task-filter="completed">Hotové</button></div>
+        </div>
+        <div class="full-task-list" id="full-task-list"></div>
+        <button class="primary-button section-add-button" id="full-add-task-button" type="button"><svg aria-hidden="true"><use href="#icon-plus"></use></svg>Přidat úkol</button>
+      </section>
+
+      <section class="app-view app-view--hidden content-panel" id="family-view" data-page="family">
+        <div class="view-toolbar"><div><p class="eyebrow">DOMÁCNOST</p><h2>Rodina Svobodových</h2></div><button class="secondary-button" id="invite-member-button" type="button"><svg aria-hidden="true"><use href="#icon-plus"></use></svg>Pozvat člena</button></div>
+        <div class="family-grid" id="family-grid"></div>
+        <article class="household-card"><div><span class="household-card__icon">⌂</span><div><strong>Domov</strong><small>Praha · 4 členové</small></div></div><span class="status-badge">Vše synchronizováno</span></article>
+      </section>
     </main>
   </div>
 
@@ -132,14 +156,26 @@
 
   <dialog class="activity-dialog" id="activity-dialog">
     <form method="dialog" id="activity-form">
-      <div class="dialog-heading"><div><p class="eyebrow">NOVÁ POLOŽKA</p><h2>Přidat aktivitu</h2></div><button value="cancel" type="button" id="close-dialog" aria-label="Zavřít">×</button></div>
+      <input name="eventId" type="hidden">
+      <div class="dialog-heading"><div><p class="eyebrow" id="activity-dialog-label">NOVÁ POLOŽKA</p><h2 id="activity-dialog-title">Přidat aktivitu</h2></div><button value="cancel" type="button" id="close-dialog" aria-label="Zavřít">×</button></div>
       <label>Název aktivity<input name="title" required maxlength="60" placeholder="Např. Trénink fotbalu"></label>
       <div class="form-row">
         <label>Člen rodiny<select name="member"><option value="jan">Jan</option><option value="petra">Petra</option><option value="eliska">Eliška</option><option value="tomas">Tomáš</option></select></label>
         <label>Čas<input name="time" type="time" required value="16:00"></label>
       </div>
+      <label>Datum<input name="date" type="date" required value="2026-08-26"></label>
       <label>Místo<input name="location" maxlength="60" placeholder="Např. Sportovní hala"></label>
-      <div class="dialog-actions"><button class="secondary-button" value="cancel" type="button" id="cancel-dialog">Zrušit</button><button class="primary-button" value="default" type="submit">Uložit aktivitu</button></div>
+      <label id="repeat-field">Opakování<select name="repeat"><option value="none">Neopakovat</option><option value="weekly-4">Každý týden · 4×</option><option value="weekly-8">Každý týden · 8×</option></select></label>
+      <div class="dialog-actions dialog-actions--spread"><button class="danger-button danger-button--hidden" type="button" id="delete-event-button">Odstranit</button><span></span><button class="secondary-button" value="cancel" type="button" id="cancel-dialog">Zrušit</button><button class="primary-button" value="default" type="submit">Uložit aktivitu</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="activity-dialog" id="task-dialog">
+    <form method="dialog" id="task-form">
+      <div class="dialog-heading"><div><p class="eyebrow">NOVÁ POVINNOST</p><h2>Přidat úkol</h2></div><button type="button" id="close-task-dialog" aria-label="Zavřít">×</button></div>
+      <label>Název úkolu<input name="title" required maxlength="70" placeholder="Např. Vyzvednout balíček"></label>
+      <div class="form-row"><label>Kdo ho splní<select name="member"><option value="jan">Jan</option><option value="petra">Petra</option><option value="eliska">Eliška</option><option value="tomas">Tomáš</option></select></label><label>Termín<input name="dueDate" type="date" required value="2026-08-26"></label></div>
+      <div class="dialog-actions"><button class="secondary-button" type="button" id="cancel-task-dialog">Zrušit</button><button class="primary-button" type="submit">Uložit úkol</button></div>
     </form>
   </dialog>
 
