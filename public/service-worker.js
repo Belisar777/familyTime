@@ -22,3 +22,11 @@ self.addEventListener('fetch', (event) => {
     return response;
   }).catch(() => caches.match(event.request).then((cachedResponse) => cachedResponse || caches.match('/index.html'))));
 });
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+    const existingClient = windowClients.find((client) => new URL(client.url).origin === self.location.origin);
+    return existingClient ? existingClient.focus() : clients.openWindow('/#today');
+  }));
+});

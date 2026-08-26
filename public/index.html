@@ -13,6 +13,29 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <section class="auth-screen" id="auth-screen" aria-labelledby="auth-title">
+    <div class="auth-panel">
+      <a class="brand auth-panel__brand" href="#" aria-label="FamilyTimes"><span class="brand__mark">F</span><span class="brand__name">Family<span>Times</span></span></a>
+      <div class="auth-panel__intro"><p class="eyebrow">VÍTEJTE DOMA</p><h1 id="auth-title">Méně chaosu.<br>Více času spolu.</h1><p>Kalendář, úkoly a rodinný program bezpečně na jednom místě.</p></div>
+      <div class="auth-tabs"><button class="auth-tab auth-tab--active" type="button" data-auth-view="login">Přihlášení</button><button class="auth-tab" type="button" data-auth-view="register">Nová rodina</button></div>
+      <form class="auth-form" id="login-form">
+        <label>E-mail<input name="email" type="email" autocomplete="email" required placeholder="jan@example.cz"></label>
+        <label>Heslo<input name="password" type="password" autocomplete="current-password" required minlength="8" placeholder="Alespoň 8 znaků"></label>
+        <p class="form-error" id="login-error" role="alert"></p>
+        <button class="primary-button" type="submit">Přihlásit se</button>
+      </form>
+      <form class="auth-form auth-form--hidden" id="register-form">
+        <label>Vaše jméno<input name="name" autocomplete="name" required maxlength="60" placeholder="Jan Svoboda"></label>
+        <label>E-mail<input name="email" type="email" autocomplete="email" required placeholder="jan@example.cz"></label>
+        <label id="register-household-field">Název domácnosti<input name="householdName" required maxlength="60" placeholder="Rodina Svobodových"></label>
+        <label>Heslo<input name="password" type="password" autocomplete="new-password" required minlength="8" placeholder="Alespoň 8 znaků"></label>
+        <p class="form-error" id="register-error" role="alert"></p>
+        <button class="primary-button" type="submit">Vytvořit rodinu</button>
+      </form>
+      <small class="auth-panel__privacy">Data zůstávají ve vaší vlastní instalaci FamilyTimes.</small>
+    </div>
+    <div class="auth-visual" aria-hidden="true"><div class="auth-visual__orb"><span>♥</span></div><p>„Méně chaosu v rodině.<br>Více času pro sebe.“</p></div>
+  </section>
   <div class="app-shell">
     <aside class="sidebar" aria-label="Hlavní navigace">
       <a class="brand" href="#today" aria-label="FamilyTimes – domů">
@@ -43,8 +66,8 @@
           <svg aria-hidden="true"><use href="#icon-settings"></use></svg><span>Nastavení</span>
         </button>
         <div class="user-card">
-          <span class="avatar avatar--photo">JS</span>
-          <span><strong>Jan Svoboda</strong><small>Správce rodiny</small></span>
+          <span class="avatar avatar--photo" id="signed-user-avatar">JS</span>
+          <span><strong id="signed-user-name">Jan Svoboda</strong><small id="signed-user-role">Správce rodiny</small></span>
           <button type="button" aria-label="Otevřít uživatelské menu">•••</button>
         </div>
       </div>
@@ -169,6 +192,7 @@
       </div>
       <label>Datum<input name="date" type="date" required value="2026-08-26"></label>
       <label>Místo<input name="location" maxlength="60" placeholder="Např. Sportovní hala"></label>
+      <label>Připomenout<select name="reminderMinutes"><option value="0">Bez připomínky</option><option value="10">10 minut předem</option><option value="30" selected>30 minut předem</option><option value="60">1 hodinu předem</option><option value="1440">1 den předem</option></select></label>
       <label id="repeat-field">Opakování<select name="repeat"><option value="none">Neopakovat</option><option value="weekly-4">Každý týden · 4×</option><option value="weekly-8">Každý týden · 8×</option></select></label>
       <div class="dialog-actions dialog-actions--spread"><button class="danger-button danger-button--hidden" type="button" id="delete-event-button">Odstranit</button><span></span><button class="secondary-button" value="cancel" type="button" id="cancel-dialog">Zrušit</button><button class="primary-button" value="default" type="submit">Uložit aktivitu</button></div>
     </form>
@@ -198,10 +222,13 @@
 
   <dialog class="activity-dialog" id="member-dialog">
     <form method="dialog" id="member-form">
-      <div class="dialog-heading"><div><p class="eyebrow">NOVÝ ČLEN</p><h2>Přidat do rodiny</h2></div><button type="button" id="close-member-dialog" aria-label="Zavřít">×</button></div>
+      <input name="memberId" type="hidden">
+      <div class="dialog-heading"><div><p class="eyebrow" id="member-dialog-label">NOVÝ ČLEN</p><h2 id="member-dialog-title">Přidat do rodiny</h2></div><button type="button" id="close-member-dialog" aria-label="Zavřít">×</button></div>
       <label>Jméno a příjmení<input name="name" required maxlength="60" placeholder="Např. Anna Svobodová"></label>
       <label>Role<select name="role"><option value="Rodič">Rodič</option><option value="Dítě">Dítě</option><option value="Prarodič">Prarodič</option><option value="Pečující osoba">Pečující osoba</option></select></label>
-      <div class="dialog-actions"><button class="secondary-button" type="button" id="cancel-member-dialog">Zrušit</button><button class="primary-button" type="submit">Přidat člena</button></div>
+      <button class="secondary-button member-invite-button" type="button" id="create-access-invite" hidden>Vytvořit pozvánku k přístupu</button>
+      <p class="form-error" id="member-error" role="alert"></p>
+      <div class="dialog-actions dialog-actions--spread"><button class="danger-button danger-button--hidden" type="button" id="delete-member-button">Odebrat</button><span></span><button class="secondary-button" type="button" id="cancel-member-dialog">Zrušit</button><button class="primary-button" type="submit" id="save-member-button">Přidat člena</button></div>
     </form>
   </dialog>
 
@@ -222,7 +249,8 @@
         <button class="secondary-button" type="button" id="download-calendar-button">Stáhnout .ics</button>
       </div>
       <div class="install-card" id="install-card" hidden><div><strong>Nainstalovat FamilyTimes</strong><small>Přidejte aplikaci na plochu a otevírejte ji jako běžnou aplikaci.</small></div><button class="secondary-button" type="button" id="install-app-button">Nainstalovat</button></div>
-      <div class="dialog-actions"><button class="secondary-button" type="button" id="cancel-settings-dialog">Zrušit</button><button class="primary-button" type="submit">Uložit nastavení</button></div>
+      <div class="dialog-actions"><button class="secondary-button" type="button" id="cancel-settings-dialog">Zrušit</button><button class="primary-button" type="submit" id="save-settings-button">Uložit nastavení</button></div>
+      <button class="logout-button" type="button" id="logout-button">Odhlásit se z FamilyTimes</button>
     </form>
   </dialog>
 
