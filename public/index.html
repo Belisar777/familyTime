@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f7f5ef">
+  <meta name="description" content="FamilyTimes – méně chaosu v rodině, více času pro sebe.">
+  <title>FamilyTimes</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Hlavní navigace">
+      <a class="brand" href="#today" aria-label="FamilyTimes – domů">
+        <span class="brand__mark" aria-hidden="true">F</span>
+        <span class="brand__name">Family<span>Times</span></span>
+      </a>
+
+      <nav class="main-nav">
+        <a class="main-nav__item main-nav__item--active" href="#today" data-view="today">
+          <svg aria-hidden="true"><use href="#icon-home"></use></svg><span>Dnes</span>
+        </a>
+        <a class="main-nav__item" href="#calendar" data-view="calendar">
+          <svg aria-hidden="true"><use href="#icon-calendar"></use></svg><span>Kalendář</span>
+        </a>
+        <a class="main-nav__item" href="#tasks" data-view="tasks">
+          <svg aria-hidden="true"><use href="#icon-check"></use></svg><span>Úkoly</span><b id="task-count">3</b>
+        </a>
+        <a class="main-nav__item" href="#family" data-view="family">
+          <svg aria-hidden="true"><use href="#icon-users"></use></svg><span>Rodina</span>
+        </a>
+      </nav>
+
+      <div class="sidebar__bottom">
+        <button class="icon-label-button" type="button" id="print-button">
+          <svg aria-hidden="true"><use href="#icon-print"></use></svg><span>Vytisknout plán</span>
+        </button>
+        <button class="icon-label-button" type="button" id="settings-button">
+          <svg aria-hidden="true"><use href="#icon-settings"></use></svg><span>Nastavení</span>
+        </button>
+        <div class="user-card">
+          <span class="avatar avatar--photo">JS</span>
+          <span><strong>Jan Svoboda</strong><small>Správce rodiny</small></span>
+          <button type="button" aria-label="Otevřít uživatelské menu">•••</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content" id="main-content">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow" id="today-label">STŘEDA, 26. SRPNA</p>
+          <h1 id="page-title">Dobré ráno, Jane <span aria-hidden="true">👋</span></h1>
+        </div>
+        <div class="topbar__actions">
+          <button class="round-button" id="notification-button" type="button" aria-label="Oznámení">
+            <svg aria-hidden="true"><use href="#icon-bell"></use></svg><span class="notification-dot"></span>
+          </button>
+          <button class="primary-button" id="add-event-button" type="button">
+            <svg aria-hidden="true"><use href="#icon-plus"></use></svg><span>Přidat aktivitu</span>
+          </button>
+        </div>
+      </header>
+
+      <section class="summary-grid" aria-label="Souhrn dne">
+        <article class="summary-card summary-card--hero">
+          <div class="summary-card__icon"><svg aria-hidden="true"><use href="#icon-sun"></use></svg></div>
+          <div><p>Dnešní den</p><strong>5 aktivit</strong><small>První v 7:30</small></div>
+          <div class="weather"><span>21°</span><small>Praha</small></div>
+        </article>
+        <article class="summary-card">
+          <div class="summary-card__icon summary-card__icon--peach"><svg aria-hidden="true"><use href="#icon-clock"></use></svg></div>
+          <div><p>Další na řadě</p><strong>Vyzvednout Elišku</strong><small>Dnes v 15:30 · Škola</small></div>
+        </article>
+        <article class="summary-card">
+          <div class="summary-card__icon summary-card__icon--green"><svg aria-hidden="true"><use href="#icon-check"></use></svg></div>
+          <div><p>Úkoly</p><strong><span id="completed-count">2</span> z 5 hotovo</strong><small>To dnes zvládnete!</small></div>
+          <div class="progress-ring" id="progress-ring"><span>40%</span></div>
+        </article>
+      </section>
+
+      <section class="planner-layout">
+        <div class="schedule-panel">
+          <div class="section-heading">
+            <div><p class="eyebrow">RODINNÝ PŘEHLED</p><h2>Tento týden</h2></div>
+            <div class="week-controls">
+              <button type="button" id="previous-week" aria-label="Předchozí týden">‹</button>
+              <button type="button" id="current-week">Tento týden</button>
+              <button type="button" id="next-week" aria-label="Následující týden">›</button>
+            </div>
+          </div>
+
+          <div class="member-filters" id="member-filters" aria-label="Filtrovat členy rodiny">
+            <button class="member-chip member-chip--active" type="button" data-member="all"><span>Všichni</span></button>
+            <button class="member-chip" type="button" data-member="jan"><span class="avatar avatar--jan">J</span> Jan</button>
+            <button class="member-chip" type="button" data-member="petra"><span class="avatar avatar--petra">P</span> Petra</button>
+            <button class="member-chip" type="button" data-member="eliska"><span class="avatar avatar--eliska">E</span> Eliška</button>
+            <button class="member-chip" type="button" data-member="tomas"><span class="avatar avatar--tomas">T</span> Tomáš</button>
+          </div>
+
+          <div class="week-strip" id="week-strip" aria-label="Dny v týdnu"></div>
+          <div class="timeline" id="timeline"></div>
+        </div>
+
+        <aside class="tasks-panel">
+          <div class="section-heading section-heading--compact">
+            <div><p class="eyebrow">CO JE POTŘEBA</p><h2>Dnešní úkoly</h2></div>
+            <button class="text-button" id="show-all-tasks" type="button">Zobrazit vše</button>
+          </div>
+          <div class="task-list" id="task-list"></div>
+          <button class="add-task-button" id="add-task-button" type="button"><svg aria-hidden="true"><use href="#icon-plus"></use></svg> Přidat úkol</button>
+
+          <article class="family-note">
+            <div class="family-note__art" aria-hidden="true"><span>♥</span></div>
+            <p>Rodinný tip</p>
+            <h3>Naplánujte si společný večer</h3>
+            <span>I malá chvíle spolu se počítá. V pátek máte všichni volno.</span>
+            <button type="button" id="plan-evening-button">Naplánovat</button>
+          </article>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <nav class="mobile-nav" aria-label="Mobilní navigace">
+    <a class="mobile-nav__item mobile-nav__item--active" href="#today" data-view="today"><svg><use href="#icon-home"></use></svg><span>Dnes</span></a>
+    <a class="mobile-nav__item" href="#calendar" data-view="calendar"><svg><use href="#icon-calendar"></use></svg><span>Kalendář</span></a>
+    <button class="mobile-nav__add" id="mobile-add-button" type="button" aria-label="Přidat aktivitu"><svg><use href="#icon-plus"></use></svg></button>
+    <a class="mobile-nav__item" href="#tasks" data-view="tasks"><svg><use href="#icon-check"></use></svg><span>Úkoly</span></a>
+    <a class="mobile-nav__item" href="#family" data-view="family"><svg><use href="#icon-users"></use></svg><span>Rodina</span></a>
+  </nav>
+
+  <dialog class="activity-dialog" id="activity-dialog">
+    <form method="dialog" id="activity-form">
+      <div class="dialog-heading"><div><p class="eyebrow">NOVÁ POLOŽKA</p><h2>Přidat aktivitu</h2></div><button value="cancel" type="button" id="close-dialog" aria-label="Zavřít">×</button></div>
+      <label>Název aktivity<input name="title" required maxlength="60" placeholder="Např. Trénink fotbalu"></label>
+      <div class="form-row">
+        <label>Člen rodiny<select name="member"><option value="jan">Jan</option><option value="petra">Petra</option><option value="eliska">Eliška</option><option value="tomas">Tomáš</option></select></label>
+        <label>Čas<input name="time" type="time" required value="16:00"></label>
+      </div>
+      <label>Místo<input name="location" maxlength="60" placeholder="Např. Sportovní hala"></label>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel" type="button" id="cancel-dialog">Zrušit</button><button class="primary-button" value="default" type="submit">Uložit aktivitu</button></div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <svg class="svg-sprite" aria-hidden="true">
+    <symbol id="icon-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10Z"/></symbol>
+    <symbol id="icon-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+    <symbol id="icon-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="icon-print" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1 1.55V21h-4v-.08a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3v-4h.08a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3h4v.08a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.55 1H21v4h-.08a1.7 1.7 0 0 0-1.55 1Z"/></symbol>
+    <symbol id="icon-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  </svg>
+  <script src="app.js"></script>
+</body>
+</html>
