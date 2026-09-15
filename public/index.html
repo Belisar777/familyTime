@@ -8,8 +8,10 @@
   <meta name="description" content="FamilyTimes – méně chaosu v rodině, více času pro sebe.">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="FamilyTimes">
   <title>FamilyTimes</title>
   <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -23,7 +25,7 @@
         <h1 id="auth-title">Méně chaosu.<br>Více času spolu.</h1>
         <p>Kalendář, úkoly a rodinný program bezpečně na jednom místě.</p>
       </div>
-      <div class="auth-tabs"><button class="auth-tab auth-tab--active" type="button" data-auth-view="login">Přihlášení</button><button class="auth-tab" type="button" data-auth-view="register">Nová rodina</button></div>
+      <div class="auth-tabs"><button class="auth-tab auth-tab--active" type="button" data-auth-view="login">Přihlášení</button><button class="auth-tab" id="register-tab" type="button" data-auth-view="register">Nová rodina</button></div>
       <form class="auth-form" id="login-form">
         <label>E-mail<input name="email" type="email" autocomplete="email" required placeholder="jan@example.cz"></label>
         <label>Heslo<input name="password" type="password" autocomplete="current-password" required minlength="8" placeholder="Alespoň 8 znaků"></label>
@@ -36,7 +38,7 @@
         <label id="register-household-field">Název domácnosti<input name="householdName" required maxlength="60" placeholder="Rodina Svobodových"></label>
         <label>Heslo<input name="password" type="password" autocomplete="new-password" required minlength="8" placeholder="Alespoň 8 znaků"></label>
         <p class="form-error" id="register-error" role="alert"></p>
-        <button class="primary-button" type="submit">Vytvořit rodinu</button>
+        <button class="primary-button" id="register-submit-button" type="submit">Vytvořit rodinu</button>
       </form>
       <small class="auth-panel__privacy">Data zůstávají ve vaší vlastní instalaci FamilyTimes.</small>
     </div>

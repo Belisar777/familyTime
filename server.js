@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const crypto = require('node:crypto');
 const { promisify } = require('node:util');
 
-const PORT = Number(process.env.PORT) || 3000;
+const PORT = Number(process.env.PORT) || 8080;
 const PUBLIC_DIRECTORY = path.join(__dirname, 'public');
 const DATA_DIRECTORY = process.env.FAMILYTIMES_DATA_DIR || path.join(__dirname, 'data');
 const HOUSEHOLDS_DIRECTORY = path.join(DATA_DIRECTORY, 'households');
