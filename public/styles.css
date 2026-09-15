@@ -590,7 +590,7 @@ h2 {
   color: white;
 }
 
-.summary-card__icon {
+.summary-card__day-badge {
   display: grid;
   width: 45px;
   height: 45px;
@@ -598,6 +598,11 @@ h2 {
   place-items: center;
   border-radius: 14px;
   background: rgb(255 255 255 / 16%);
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .summary-card__icon--peach {

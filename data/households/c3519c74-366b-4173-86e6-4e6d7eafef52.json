@@ -62,6 +62,15 @@
       "time": "17:30",
       "location": "Základní škola",
       "reminderMinutes": 30
+    },
+    {
+      "id": 1789495251593,
+      "title": "Hokus pokus",
+      "member": "jan",
+      "date": "2026-09-18",
+      "time": "16:00",
+      "location": "",
+      "reminderMinutes": 30
     }
   ],
   "tasks": [
@@ -135,5 +144,5 @@
     "householdName": "Rodina Svobodových",
     "city": "Nuuk"
   },
-  "updatedAt": "2026-09-15T17:44:46.954Z"
+  "updatedAt": "2026-09-15T18:00:51.593Z"
 }

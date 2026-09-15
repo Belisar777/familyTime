@@ -121,11 +121,9 @@
 
       <section class="summary-grid app-view" id="today-summary" data-page="today" aria-label="Souhrn dne">
         <article class="summary-card summary-card--hero">
-          <div class="summary-card__icon"><svg aria-hidden="true">
-              <use href="#icon-sun"></use>
-            </svg></div>
+          <div class="summary-card__day-badge" aria-live="polite"><span id="summary-day-shortcut">Út</span></div>
           <div>
-            <p>Dnešní den</p><strong>5 aktivit</strong><small>První v 7:30</small>
+            <p id="summary-day-label">Dnešní den</p><strong>5 aktivit</strong><small>První v 7:30</small>
           </div>
           <div class="weather"><span class="weather__icon" aria-label="Počasí">☀️</span><span class="weather__temp">21°</span><small>Praha</small></div>
         </article>
