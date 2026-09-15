@@ -126,7 +126,34 @@ function renderMemberControls() {
   document.querySelectorAll('select[name="member"]').forEach((select) => { const previousValue = select.value; select.innerHTML = memberOptions; if (memberDetails[previousValue]) select.value = previousValue; });
   const calendarSelect = document.querySelector('#calendar-member-select'); const selectedCalendarMember = calendarSelect.value || 'all'; calendarSelect.innerHTML = `<option value="all">Celá rodina</option>${memberOptions}`; calendarSelect.value = memberDetails[selectedCalendarMember] ? selectedCalendarMember : 'all'; updateCalendarFeedUrl();
 }
-function updateDashboardSummary() { const events = familyData.events.filter((event) => event.date === formatDateKey(TODAY_DATE)).sort((a, b) => a.time.localeCompare(b.time)); const card = document.querySelector('.summary-card--hero'); card.querySelector('strong').textContent = `${events.length} aktivit`; card.querySelector('small').textContent = events.length ? `První v ${events[0].time}` : 'Volný den'; }
+function parseTimeToMinutes(timeString = '00:00') { const [hours, minutes] = String(timeString).split(':').map(Number); return hours * 60 + minutes; }
+function getNextUpEvent(events = []) {
+  const dayEvents = [...events]
+    .filter((event) => event.date === formatDateKey(TODAY_DATE))
+    .sort((a, b) => parseTimeToMinutes(a.time) - parseTimeToMinutes(b.time));
+  if (!dayEvents.length) return null;
+  const nowMinutes = new Date().getHours() * 60 + new Date().getMinutes();
+  return dayEvents.find((event) => parseTimeToMinutes(event.time) >= nowMinutes) || dayEvents[0];
+}
+function updateDashboardSummary() {
+  const events = familyData.events.filter((event) => event.date === formatDateKey(TODAY_DATE));
+  const nextEvent = getNextUpEvent(events);
+  const firstEvent = [...events].sort((a, b) => parseTimeToMinutes(a.time) - parseTimeToMinutes(b.time))[0] || null;
+  const card = document.querySelector('.summary-card--hero');
+  card.querySelector('strong').textContent = `${events.length} aktivit`;
+  card.querySelector('small').textContent = firstEvent ? `První v ${firstEvent.time}` : 'Volný den';
+
+  const nextCard = document.querySelector('.summary-card:nth-of-type(2)');
+  const nextTitle = nextCard ? nextCard.querySelector('strong') : null;
+  const nextMeta = nextCard ? nextCard.querySelector('small') : null;
+  if (nextEvent && nextTitle && nextMeta) {
+    nextTitle.textContent = nextEvent.title;
+    nextMeta.textContent = `Dnes v ${nextEvent.time} · ${nextEvent.location || 'Rodina'}`;
+  } else if (nextTitle && nextMeta) {
+    nextTitle.textContent = 'Žádná další aktivita';
+    nextMeta.textContent = 'Dnes není naplánovaná žádná aktivita';
+  }
+}
 function renderApplication() { renderMemberControls(); renderWeekStrip(); renderTimeline(); renderDashboardTasks(); renderFullTaskList(); renderMonthCalendar(); renderFamilyMembers(); updateDashboardSummary(); }
 function showToast(message) { const toast = document.querySelector('#toast'); toast.textContent = message; toast.classList.add('toast--visible'); clearTimeout(showToast.timeoutId); showToast.timeoutId = setTimeout(() => toast.classList.remove('toast--visible'), 2400); }
 function openActivityDialog(title = '', date = formatDateKey(selectedDate)) { if (currentUserRole && currentUserRole !== 'admin') { showToast('Aktivity může měnit pouze správce rodiny.'); return; } const dialog = document.querySelector('#activity-dialog'); document.querySelector('#activity-form').reset(); dialog.querySelector('[name="eventId"]').value = ''; dialog.querySelector('[name="title"]').value = title; dialog.querySelector('[name="time"]').value = '16:00'; dialog.querySelector('[name="date"]').value = date; document.querySelector('#activity-dialog-label').textContent = 'NOVÁ POLOŽKA'; document.querySelector('#activity-dialog-title').textContent = 'Přidat aktivitu'; document.querySelector('#repeat-field').hidden = false; document.querySelector('#delete-event-button').classList.add('danger-button--hidden'); dialog.showModal(); dialog.querySelector('[name="title"]').focus(); }
@@ -144,6 +171,62 @@ function exportFamilyData() { const backup = { version: 1, exportedAt: new Date(
 function validateBackupData(backup) { const data = backup && backup.data; if (!data || !Array.isArray(data.events) || !Array.isArray(data.tasks) || !data.members || typeof data.members !== 'object' || Array.isArray(data.members)) throw new Error('Neplatná struktura zálohy.'); const members = {}; Object.entries(data.members).forEach(([key, member]) => { if (!/^[a-z0-9-]+$/.test(key) || !member || typeof member.name !== 'string' || typeof member.role !== 'string') throw new Error('Neplatný člen rodiny.'); const color = Number.isFinite(Number(member.color)) ? ((Math.floor(Number(member.color)) % 6) + 6) % 6 : 0; members[key] = { name: member.name.slice(0, 60), shortName: String(member.shortName || member.name.split(/\s+/)[0]).slice(0, 30), initial: String(member.initial || member.name.charAt(0)).slice(0, 1).toUpperCase(), role: member.role.slice(0, 40), color }; }); const memberKeys = new Set(Object.keys(members)); const events = data.events.map((event) => { if (!event || !Number.isFinite(Number(event.id)) || !memberKeys.has(event.member) || typeof event.title !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(event.date) || !/^\d{2}:\d{2}$/.test(event.time)) throw new Error('Neplatná aktivita.'); return { id: Number(event.id), title: event.title.slice(0, 60), member: event.member, date: event.date, time: event.time, location: String(event.location || '').slice(0, 60), reminderMinutes: Math.max(0, Number(event.reminderMinutes || 0)) }; }); const tasks = data.tasks.map((task) => { if (!task || !Number.isFinite(Number(task.id)) || !memberKeys.has(task.member) || typeof task.title !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(task.dueDate)) throw new Error('Neplatný úkol.'); return { id: Number(task.id), title: task.title.slice(0, 70), member: task.member, dueDate: task.dueDate, completed: Boolean(task.completed) }; }); const settings = data.settings && typeof data.settings.householdName === 'string' ? { householdName: data.settings.householdName.slice(0, 60), city: String(data.settings.city || '').slice(0, 60) } : DEFAULT_SETTINGS; const updatedAt = typeof data.updatedAt === 'string' ? data.updatedAt : ''; return { events, tasks, members, settings, updatedAt }; }
 async function importFamilyData(file) { try { const backup = JSON.parse(await file.text()); familyData = validateBackupData(backup); memberDetails = familyData.members; selectedMember = 'all'; saveFamilyData(); renderApplication(); document.querySelector('#settings-dialog').close(); showToast('Rodinná data byla obnovena ze zálohy.'); } catch { showToast('Soubor není platná záloha FamilyTimes.'); } }
 function formatLongDate(date) { return `${DAY_NAMES[(date.getDay() + 6) % 7]} ${date.getDate()}. ${MONTH_DATE_NAMES[date.getMonth()]} ${date.getFullYear()}`; }
+function getWeatherIcon(weatherCode) {
+  const code = Number(weatherCode ?? 0);
+  if ([0].includes(code)) return '☀️';
+  if ([1, 2].includes(code)) return '⛅';
+  if ([3].includes(code)) return '☁️';
+  if ([45, 48].includes(code)) return '🌫️';
+  if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return '🌧️';
+  if ([71, 73, 75, 77, 85, 86].includes(code)) return '❄️';
+  if ([95, 96, 99].includes(code)) return '⛈️';
+  return '☀️';
+}
+function setWeatherSummary(temperature, cityName, weatherCode) {
+  const weather = document.querySelector('.weather');
+  if (!weather) return;
+  const tempNode = weather.querySelector('.weather__temp');
+  const iconNode = weather.querySelector('.weather__icon');
+  if (tempNode) tempNode.textContent = `${Math.round(Number(temperature))}°`;
+  if (iconNode) iconNode.textContent = getWeatherIcon(weatherCode);
+  const cityNode = weather.querySelector('small');
+  if (cityNode) cityNode.textContent = cityName || 'Praha';
+}
+function normalizeCityQuery(cityName = 'Praha') {
+  const rawCity = String(cityName || 'Praha').trim();
+  if (!rawCity) return 'Praha';
+  const withoutAddress = rawCity.split(',')[0].trim();
+  return withoutAddress.replace(/\s+\d+[A-Za-z]?\s*$/, '').trim() || 'Praha';
+}
+async function fetchWeatherForCity(cityName = 'Praha') {
+  const cityCandidates = [normalizeCityQuery(cityName), String(cityName || 'Praha').trim()].filter(Boolean).filter((value, index, list) => list.indexOf(value) === index);
+  let lastError = null;
+  for (const city of cityCandidates) {
+    try {
+      const geoResponse = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=cs&format=json`);
+      if (!geoResponse.ok) throw new Error('Město nebylo možné dohledat.');
+      const geoData = await geoResponse.json();
+      const match = geoData.results && geoData.results[0];
+      if (!match) throw new Error('Město nebylo nalezeno.');
+      const weatherResponse = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${match.latitude}&longitude=${match.longitude}&current=temperature_2m,weather_code&timezone=auto&forecast_days=1`);
+      if (!weatherResponse.ok) throw new Error('Předpověď počasí se nepodařila načíst.');
+      const weatherData = await weatherResponse.json();
+      return { city: match.name || city, temperature: Number(weatherData.current?.temperature_2m ?? 0), weatherCode: Number(weatherData.current?.weather_code ?? 0) };
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError || new Error('Předpověď počasí se nepodařila načíst.');
+}
+async function loadWeatherForCurrentCity() {
+  const cityName = familyData.settings.city || DEFAULT_SETTINGS.city;
+  try {
+    const forecast = await fetchWeatherForCity(cityName);
+    setWeatherSummary(forecast.temperature, forecast.city, forecast.weatherCode);
+  } catch {
+    setWeatherSummary(21, normalizeCityQuery(cityName), 0);
+  }
+}
 function createPrintEvents(events) { if (!events.length) return '<p class="print-empty">Žádné naplánované aktivity.</p>'; return events.sort((a, b) => a.time.localeCompare(b.time)).map((event) => `<div class="print-entry"><time>${event.time}</time><span><b>${escapeHtml(event.title)}</b><br>${escapeHtml(event.location || 'Bez místa')}</span><small>${escapeHtml(memberDetails[event.member].shortName)}</small></div>`).join(''); }
 function createPrintTasks(tasks) { if (!tasks.length) return '<p class="print-empty">Žádné úkoly.</p>'; return tasks.map((task) => `<div class="print-task ${task.completed ? 'print-task--done' : ''}"><span class="print-task__check">${task.completed ? '✓' : ''}</span><span>${escapeHtml(task.title)}</span><small>${escapeHtml(memberDetails[task.member].shortName)} · ${formatDueDate(task.dueDate)}</small></div>`).join(''); }
 function createPrintReport(reportType, memberKey) {
@@ -167,7 +250,7 @@ document.querySelector('#full-task-list').addEventListener('click', (event) => {
 document.querySelector('#activity-form').addEventListener('submit', (event) => { event.preventDefault(); const data = new FormData(event.currentTarget); const eventId = Number(data.get('eventId')); const eventData = { title: data.get('title').trim(), member: data.get('member'), date: data.get('date'), time: data.get('time'), location: data.get('location').trim(), reminderMinutes: Number(data.get('reminderMinutes')) }; if (eventId) { const eventIndex = familyData.events.findIndex((item) => item.id === eventId); if (eventIndex >= 0) familyData.events[eventIndex] = { ...familyData.events[eventIndex], ...eventData }; } else { const repeatCount = { none: 1, 'weekly-4': 4, 'weekly-8': 8 }[data.get('repeat')] || 1; const firstDate = new Date(`${eventData.date}T12:00:00`); for (let index = 0; index < repeatCount; index += 1) { const occurrenceDate = new Date(firstDate); occurrenceDate.setDate(firstDate.getDate() + index * 7); familyData.events.push({ id: Date.now() + index, ...eventData, date: formatDateKey(occurrenceDate) }); } } saveFamilyData(); renderApplication(); document.querySelector('#activity-dialog').close(); showToast(eventId ? 'Změny aktivity byly uloženy.' : 'Aktivita byla přidána do rodinného plánu.'); });
 document.querySelector('#task-form').addEventListener('submit', (event) => { event.preventDefault(); const data = new FormData(event.currentTarget); familyData.tasks.push({ id: Date.now(), title: data.get('title').trim(), member: data.get('member'), dueDate: data.get('dueDate'), completed: false }); saveFamilyData(); renderDashboardTasks(); renderFullTaskList(); renderFamilyMembers(); document.querySelector('#task-dialog').close(); showToast('Nový úkol byl přidán.'); });
 document.querySelector('#member-form').addEventListener('submit', (event) => { event.preventDefault(); const data = new FormData(event.currentTarget); const name = data.get('name').trim(); const existingMemberKey = data.get('memberId'); const memberKey = existingMemberKey || createUniqueKey('member'); const originalMember = memberDetails[memberKey]; memberDetails[memberKey] = { name, shortName: name.split(/\s+/)[0], initial: name.charAt(0).toUpperCase(), role: data.get('role'), color: originalMember ? originalMember.color : Object.keys(memberDetails).length % 6 }; familyData.members = memberDetails; saveFamilyData(); renderApplication(); document.querySelector('#member-dialog').close(); showToast(existingMemberKey ? 'Profil člena byl upraven.' : `${name} byl přidán do rodiny.`); });
-document.querySelector('#settings-form').addEventListener('submit', (event) => { event.preventDefault(); const data = new FormData(event.currentTarget); familyData.settings = { householdName: data.get('householdName').trim(), city: data.get('city').trim() }; saveFamilyData(); renderFamilyMembers(); document.querySelector('#settings-dialog').close(); showToast('Nastavení domácnosti bylo uloženo.'); });
+document.querySelector('#settings-form').addEventListener('submit', (event) => { event.preventDefault(); const data = new FormData(event.currentTarget); familyData.settings = { householdName: data.get('householdName').trim(), city: data.get('city').trim() }; saveFamilyData(); renderFamilyMembers(); loadWeatherForCurrentCity(); document.querySelector('#settings-dialog').close(); showToast('Nastavení domácnosti bylo uloženo.'); });
 document.querySelector('#print-form').addEventListener('change', (event) => { if (event.target.name === 'reportType') document.querySelector('#print-member-field').classList.toggle('print-member-field--visible', event.target.value === 'member'); });
 document.querySelector('#print-form').addEventListener('submit', (event) => { event.preventDefault(); const data = new FormData(event.currentTarget); createPrintReport(data.get('reportType'), data.get('member')); document.querySelector('#print-dialog').close(); requestAnimationFrame(() => window.print()); });
 document.querySelector('#calendar-member-select').addEventListener('change', updateCalendarFeedUrl); document.querySelector('#copy-calendar-link').addEventListener('click', copyCalendarFeedUrl); document.querySelector('#download-calendar-button').addEventListener('click', downloadCalendarFile);
@@ -192,5 +275,5 @@ window.addEventListener('beforeinstallprompt', (event) => { event.preventDefault
 window.addEventListener('appinstalled', () => { installPromptEvent = undefined; document.querySelector('#install-card').hidden = true; showToast('FamilyTimes byl nainstalován.'); });
 document.querySelector('#install-app-button').addEventListener('click', async () => { if (!installPromptEvent) return; installPromptEvent.prompt(); await installPromptEvent.userChoice; installPromptEvent = undefined; document.querySelector('#install-card').hidden = true; });
 
-function initializeApplication() { document.querySelector('#today-label').textContent = `${DAY_NAMES[(TODAY_DATE.getDay() + 6) % 7]}, ${TODAY_DATE.getDate()}. ${MONTH_DATE_NAMES[TODAY_DATE.getMonth()]}`.toUpperCase(); renderApplication(); const view = ['today', 'calendar', 'tasks', 'family'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'today'; changeView(view); const inviteToken = new URLSearchParams(location.search).get('invite'); if (inviteToken) { const registerTab = document.querySelector('[data-auth-view="register"]'); registerTab.click(); document.querySelector('#auth-title').textContent = 'Přijměte pozvání.'; document.querySelector('#register-household-field').hidden = true; document.querySelector('#register-household-field input').required = false; } checkAuthentication(); setInterval(() => { checkUpcomingReminders(); if ((location.hash.slice(1) || 'today') === 'today') changeView('today'); }, 60000); if ('serviceWorker' in navigator) navigator.serviceWorker.register('/service-worker.js').catch(() => updateSyncStatus('Offline režim není dostupný', true)); }
+function initializeApplication() { document.querySelector('#today-label').textContent = `${DAY_NAMES[(TODAY_DATE.getDay() + 6) % 7]}, ${TODAY_DATE.getDate()}. ${MONTH_DATE_NAMES[TODAY_DATE.getMonth()]}`.toUpperCase(); renderApplication(); loadWeatherForCurrentCity(); const view = ['today', 'calendar', 'tasks', 'family'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'today'; changeView(view); const inviteToken = new URLSearchParams(location.search).get('invite'); if (inviteToken) { const registerTab = document.querySelector('[data-auth-view="register"]'); registerTab.click(); document.querySelector('#auth-title').textContent = 'Přijměte pozvání.'; document.querySelector('#register-household-field').hidden = true; document.querySelector('#register-household-field input').required = false; } checkAuthentication(); setInterval(() => { checkUpcomingReminders(); if ((location.hash.slice(1) || 'today') === 'today') changeView('today'); }, 60000); if ('serviceWorker' in navigator) navigator.serviceWorker.register('/service-worker.js').catch(() => updateSyncStatus('Offline režim není dostupný', true)); }
 initializeApplication();

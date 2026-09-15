@@ -1,0 +1,139 @@
+{
+  "events": [
+    {
+      "id": 1,
+      "title": "Ranní porada",
+      "member": "jan",
+      "date": "2026-09-15",
+      "time": "07:30",
+      "location": "Online",
+      "reminderMinutes": 30
+    },
+    {
+      "id": 2,
+      "title": "Zubař",
+      "member": "petra",
+      "date": "2026-09-15",
+      "time": "10:00",
+      "location": "Poliklinika Vinohrady",
+      "reminderMinutes": 30
+    },
+    {
+      "id": 3,
+      "title": "Vyzvednout Elišku",
+      "member": "jan",
+      "date": "2026-09-15",
+      "time": "15:30",
+      "location": "Základní škola",
+      "reminderMinutes": 30
+    },
+    {
+      "id": 4,
+      "title": "Klavír",
+      "member": "eliska",
+      "date": "2026-09-15",
+      "time": "16:30",
+      "location": "ZUŠ",
+      "reminderMinutes": 30
+    },
+    {
+      "id": 5,
+      "title": "Fotbalový trénink",
+      "member": "tomas",
+      "date": "2026-09-15",
+      "time": "17:00",
+      "location": "SK Meteor",
+      "reminderMinutes": 30
+    },
+    {
+      "id": 6,
+      "title": "Rodinný oběd",
+      "member": "petra",
+      "date": "2026-09-19",
+      "time": "12:00",
+      "location": "U babičky",
+      "reminderMinutes": 30
+    },
+    {
+      "id": 7,
+      "title": "Třídní schůzky",
+      "member": "jan",
+      "date": "2026-09-23",
+      "time": "17:30",
+      "location": "Základní škola",
+      "reminderMinutes": 30
+    }
+  ],
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Objednat Tomáše k lékaři",
+      "member": "petra",
+      "dueDate": "2026-09-15",
+      "completed": true
+    },
+    {
+      "id": 2,
+      "title": "Vynést tříděný odpad",
+      "member": "tomas",
+      "dueDate": "2026-09-15",
+      "completed": false
+    },
+    {
+      "id": 3,
+      "title": "Koupit věci na snídani",
+      "member": "jan",
+      "dueDate": "2026-09-15",
+      "completed": false
+    },
+    {
+      "id": 4,
+      "title": "Potvrdit školní výlet",
+      "member": "petra",
+      "dueDate": "2026-09-15",
+      "completed": true
+    },
+    {
+      "id": 5,
+      "title": "Zalít bylinky",
+      "member": "eliska",
+      "dueDate": "2026-09-15",
+      "completed": false
+    }
+  ],
+  "members": {
+    "jan": {
+      "name": "Svobodovy",
+      "shortName": "Svobodovy",
+      "initial": "S",
+      "role": "Správce rodiny",
+      "color": 0
+    },
+    "petra": {
+      "name": "Petra Svobodová",
+      "shortName": "Petra",
+      "initial": "P",
+      "role": "Rodič",
+      "color": 1
+    },
+    "eliska": {
+      "name": "Eliška Svobodová",
+      "shortName": "Eliška",
+      "initial": "E",
+      "role": "Dítě",
+      "color": 2
+    },
+    "tomas": {
+      "name": "Tomáš Svoboda",
+      "shortName": "Tomáš",
+      "initial": "T",
+      "role": "Dítě",
+      "color": 3
+    }
+  },
+  "settings": {
+    "householdName": "Rodina Svobodových",
+    "city": "Nuuk"
+  },
+  "updatedAt": "2026-09-15T17:44:46.954Z"
+}

@@ -62,43 +62,144 @@
       "time": "16:00",
       "location": "Doma",
       "reminderMinutes": 30
+    },
+    {
+      "id": 1789493042273,
+      "title": "Trénink",
+      "member": "jan",
+      "date": "2026-09-22",
+      "time": "16:00",
+      "location": "Doma",
+      "reminderMinutes": 30
+    },
+    {
+      "id": 1789493042274,
+      "title": "Trénink",
+      "member": "jan",
+      "date": "2026-09-29",
+      "time": "16:00",
+      "location": "Doma",
+      "reminderMinutes": 30
+    },
+    {
+      "id": 1789493042275,
+      "title": "Trénink",
+      "member": "jan",
+      "date": "2026-10-06",
+      "time": "16:00",
+      "location": "Doma",
+      "reminderMinutes": 30
+    },
+    {
+      "id": 1789493077488,
+      "title": "Zavolat",
+      "member": "tomas",
+      "date": "2026-09-15",
+      "time": "16:00",
+      "location": "",
+      "reminderMinutes": 60
+    },
+    {
+      "id": 1789493077489,
+      "title": "Zavolat",
+      "member": "tomas",
+      "date": "2026-09-22",
+      "time": "16:00",
+      "location": "",
+      "reminderMinutes": 60
+    },
+    {
+      "id": 1789493077490,
+      "title": "Zavolat",
+      "member": "tomas",
+      "date": "2026-09-29",
+      "time": "16:00",
+      "location": "",
+      "reminderMinutes": 60
+    },
+    {
+      "id": 1789493077491,
+      "title": "Zavolat",
+      "member": "tomas",
+      "date": "2026-10-06",
+      "time": "16:00",
+      "location": "",
+      "reminderMinutes": 60
+    },
+    {
+      "id": 1789493077492,
+      "title": "Zavolat",
+      "member": "tomas",
+      "date": "2026-10-13",
+      "time": "16:00",
+      "location": "",
+      "reminderMinutes": 60
+    },
+    {
+      "id": 1789493077493,
+      "title": "Zavolat",
+      "member": "tomas",
+      "date": "2026-10-20",
+      "time": "16:00",
+      "location": "",
+      "reminderMinutes": 60
+    },
+    {
+      "id": 1789493077494,
+      "title": "Zavolat",
+      "member": "tomas",
+      "date": "2026-10-27",
+      "time": "16:00",
+      "location": "",
+      "reminderMinutes": 60
+    },
+    {
+      "id": 1789493077495,
+      "title": "Zavolat",
+      "member": "tomas",
+      "date": "2026-11-03",
+      "time": "16:00",
+      "location": "",
+      "reminderMinutes": 60
+    },
+    {
+      "id": 1789493115669,
+      "title": "Modlitba",
+      "member": "eliska",
+      "date": "2026-09-15",
+      "time": "18:00",
+      "location": "Online",
+      "reminderMinutes": 0
     }
   ],
   "tasks": [
     {
-      "id": 1,
-      "title": "Objednat Tomáše k lékaři",
-      "member": "petra",
-      "dueDate": "2026-08-26",
-      "completed": true
-    },
-    {
-      "id": 2,
-      "title": "Vynést tříděný odpad",
-      "member": "tomas",
-      "dueDate": "2026-08-26",
-      "completed": true
-    },
-    {
-      "id": 3,
-      "title": "Koupit věci na snídani",
+      "id": 1789492855479,
+      "title": "Nakoupit pečivo",
       "member": "jan",
-      "dueDate": "2026-08-26",
-      "completed": true
+      "dueDate": "2026-09-16",
+      "completed": false
     },
     {
-      "id": 4,
-      "title": "Potvrdit školní výlet",
+      "id": 1789492866995,
+      "title": "Zavolat Radko Křivánek",
+      "member": "jan",
+      "dueDate": "2026-09-16",
+      "completed": false
+    },
+    {
+      "id": 1789492883491,
+      "title": "Očistit sklo krbu",
       "member": "petra",
-      "dueDate": "2026-08-26",
-      "completed": true
+      "dueDate": "2026-09-17",
+      "completed": false
     },
     {
-      "id": 5,
-      "title": "Zalít bylinky",
-      "member": "eliska",
-      "dueDate": "2026-08-26",
-      "completed": true
+      "id": 1789492940658,
+      "title": "Nakrmit kočku",
+      "member": "member-cbc98e21-33f3-4b04-941c-1afea70bcf75",
+      "dueDate": "2026-09-15",
+      "completed": false
     }
   ],
   "members": {
@@ -154,7 +255,7 @@
   },
   "settings": {
     "householdName": "Rodina Šecových",
-    "city": "Plzeň"
+    "city": "Letiny 57"
   },
-  "updatedAt": "2026-08-26T17:38:11.595Z"
+  "updatedAt": "2026-09-15T17:32:55.243Z"
 }

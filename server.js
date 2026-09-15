@@ -170,7 +170,7 @@ async function sendCalendarFeed(response, memberKey, calendarToken) {
 function createServer() {
   return http.createServer((request, response) => {
     const requestUrl = new URL(request.url, `http://${request.headers.host || 'localhost'}`);
-    response.setHeader('Referrer-Policy', 'same-origin'); response.setHeader('X-Frame-Options', 'DENY'); response.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()'); response.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
+    response.setHeader('Referrer-Policy', 'same-origin'); response.setHeader('X-Frame-Options', 'DENY'); response.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()'); response.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.open-meteo.com https://geocoding-api.open-meteo.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
     if (requestUrl.pathname.startsWith('/api/auth/')) { handleAuthRequest(request, response, requestUrl.pathname); return; }
     if (requestUrl.pathname === '/api/invitations') { handleInvitationRequest(request, response); return; }
     if (requestUrl.pathname === '/api/family-data') { handleFamilyDataRequest(request, response); return; }
