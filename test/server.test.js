@@ -36,6 +36,12 @@ test('chrání rodinná data bez přihlášení', async () => {
   assert.equal(response.status, 401);
 });
 
+test('vrací nepřihlášený stav bez chyby autorizace', async () => {
+  const response = await fetch(`${baseUrl}/api/auth/status`);
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { authenticated: false });
+});
+
 test('registruje domácnost, ukládá data a poskytuje kalendář', async () => {
   const registration = await fetch(`${baseUrl}/api/auth/register`, {
     method: 'POST',
@@ -65,6 +71,7 @@ test('registruje domácnost, ukládá data a poskytuje kalendář', async () => 
       'member-five': { name: 'Anna Testovací', shortName: 'Anna', initial: 'A', role: 'Prarodič', color: 4 },
       'member-six': { name: 'Pavel Testovací', shortName: 'Pavel', initial: 'P', role: 'Pečující osoba', color: 5 }
     },
+    tasks: [{ ...sampleData.tasks[0], createdByUserId: registrationData.user.id }],
     settings: { ...sampleData.settings, city: 'Brno' }
   };
   const saveResponse = await fetch(`${baseUrl}/api/family-data`, { method: 'PUT', headers: { Cookie: cookie, 'Content-Type': 'application/json' }, body: JSON.stringify(changedData) });
@@ -75,13 +82,20 @@ test('registruje domácnost, ukládá data a poskytuje kalendář', async () => 
   const invitationResponse = await fetch(`${baseUrl}/api/invitations`, { method: 'POST', headers: { Cookie: cookie, 'Content-Type': 'application/json' }, body: JSON.stringify({ memberId: 'jan' }) });
   assert.equal(invitationResponse.status, 201);
   const invitation = await invitationResponse.json();
-  const memberRegistration = await fetch(`${baseUrl}/api/auth/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'Jana Testovací', email: 'jana@example.test', password: 'druhebezpecneheslo', inviteToken: invitation.token }) });
+  const invitationInfoResponse = await fetch(`${baseUrl}/api/invitation-info?token=${encodeURIComponent(invitation.token)}`);
+  assert.equal(invitationInfoResponse.status, 200);
+  assert.deepEqual(await invitationInfoResponse.json(), { householdName: 'Testovací rodina', memberName: 'Jan Testovací' });
+  const changedNameRegistration = await fetch(`${baseUrl}/api/auth/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'Jana Testovací', email: 'jana-changed@example.test', password: 'druhebezpecneheslo', inviteToken: invitation.token }) });
+  assert.equal(changedNameRegistration.status, 400);
+  const memberRegistration = await fetch(`${baseUrl}/api/auth/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'Jan Testovací', email: 'jana@example.test', password: 'druhebezpecneheslo', inviteToken: invitation.token }) });
   assert.equal(memberRegistration.status, 201);
   const memberCookie = memberRegistration.headers.get('set-cookie').split(';')[0];
   assert.equal((await memberRegistration.json()).user.role, 'member');
 
   const memberDataResponse = await fetch(`${baseUrl}/api/family-data`, { headers: { Cookie: memberCookie } });
   const memberData = await memberDataResponse.json();
+  const memberDelete = await fetch(`${baseUrl}/api/family-data`, { method: 'PUT', headers: { Cookie: memberCookie, 'Content-Type': 'application/json' }, body: JSON.stringify({ ...memberData, tasks: [] }) });
+  assert.equal(memberDelete.status, 403);
   memberData.tasks[0].completed = true;
   const memberSave = await fetch(`${baseUrl}/api/family-data`, { method: 'PUT', headers: { Cookie: memberCookie, 'Content-Type': 'application/json' }, body: JSON.stringify(memberData) });
   assert.equal(memberSave.status, 200);

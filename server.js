@@ -110,12 +110,12 @@ function sanitizeFamilyData(data) {
 async function handleAuthRequest(request, response, pathname) {
   try {
     if (pathname === '/api/auth/register' && request.method === 'POST') {
-      const body = await readRequestBody(request); const email = String(body.email || '').trim().toLowerCase(); const name = String(body.name || '').trim(); const password = String(body.password || ''); const householdName = String(body.householdName || '').trim(); const inviteToken = String(body.inviteToken || '');
+      const body = await readRequestBody(request); const email = String(body.email || '').trim().toLowerCase(); let name = String(body.name || '').trim(); const password = String(body.password || ''); const householdName = String(body.householdName || '').trim(); const inviteToken = String(body.inviteToken || '');
       if (!/^\S+@\S+\.\S+$/.test(email) || name.length < 2 || password.length < 8 || (!inviteToken && householdName.length < 2)) { sendJson(response, 400, { error: 'Vyplňte platný e-mail, jméno, domácnost a heslo alespoň 8 znaků.' }); return; }
       const authData = await readJsonFile(AUTH_DATA_FILE, { users: [], households: [], invitations: [] }); authData.invitations ||= [];
       if (authData.users.some((user) => user.email === email)) { sendJson(response, 409, { error: 'Účet s tímto e-mailem už existuje.' }); return; }
       let householdId; let household; let role = 'admin'; let memberId = null;
-      if (inviteToken) { const invitation = authData.invitations.find((item) => item.token === inviteToken && !item.usedAt && new Date(item.expiresAt) > new Date()); if (!invitation) { sendJson(response, 400, { error: 'Pozvánka je neplatná nebo vypršela.' }); return; } householdId = invitation.householdId; memberId = invitation.memberId; role = 'member'; invitation.usedAt = new Date().toISOString(); household = authData.households.find((item) => item.id === householdId); }
+      if (inviteToken) { const invitation = authData.invitations.find((item) => item.token === inviteToken && !item.usedAt && new Date(item.expiresAt) > new Date()); if (!invitation) { sendJson(response, 400, { error: 'Pozvánka je neplatná nebo vypršela.' }); return; } const familyData = await readJsonFile(path.join(HOUSEHOLDS_DIRECTORY, `${invitation.householdId}.json`), null); const invitedMember = familyData && familyData.members && familyData.members[invitation.memberId]; if (!invitedMember || name !== invitedMember.name) { sendJson(response, 400, { error: 'Jméno pozvaného člena nelze změnit.' }); return; } householdId = invitation.householdId; memberId = invitation.memberId; role = 'member'; invitation.usedAt = new Date().toISOString(); household = authData.households.find((item) => item.id === householdId); }
       else { householdId = crypto.randomUUID(); const calendarToken = crypto.randomBytes(24).toString('base64url'); household = { id: householdId, name: householdName, calendarToken, createdAt: new Date().toISOString() }; authData.households.push(household); }
       const userId = crypto.randomUUID(); const passwordData = await hashPassword(password);
       authData.users.push({ id: userId, householdId, memberId, email, name, role, passwordSalt: passwordData.salt, passwordHash: passwordData.hash, createdAt: new Date().toISOString() });
@@ -131,7 +131,7 @@ async function handleAuthRequest(request, response, pathname) {
       const household = authData.households.find((item) => item.id === user.householdId); const token = createSessionToken(user.id); sendJson(response, 200, { user: { id: user.id, email: user.email, name: user.name, role: user.role, memberId: user.memberId }, household: { id: household.id, name: household.name }, calendarToken: household.calendarToken }, { 'Set-Cookie': createSessionCookie(token) }); return;
     }
     if (pathname === '/api/auth/logout' && request.method === 'POST') { sendJson(response, 200, { loggedOut: true }, { 'Set-Cookie': createSessionCookie('', true) }); return; }
-    if (pathname === '/api/auth/status' && request.method === 'GET') { const context = await getAuthenticatedContext(request); if (!context) { sendJson(response, 401, { authenticated: false }); return; } sendJson(response, 200, { authenticated: true, user: { id: context.user.id, email: context.user.email, name: context.user.name, role: context.user.role, memberId: context.user.memberId }, household: { id: context.household.id, name: context.household.name }, calendarToken: context.household.calendarToken }); return; }
+    if (pathname === '/api/auth/status' && request.method === 'GET') { const context = await getAuthenticatedContext(request); if (!context) { sendJson(response, 200, { authenticated: false }); return; } sendJson(response, 200, { authenticated: true, user: { id: context.user.id, email: context.user.email, name: context.user.name, role: context.user.role, memberId: context.user.memberId }, household: { id: context.household.id, name: context.household.name }, calendarToken: context.household.calendarToken }); return; }
     sendJson(response, 405, { error: 'Nepodporovaná metoda.' }, { Allow: 'GET, POST' });
   } catch (error) { sendJson(response, error.statusCode || 500, { error: error.statusCode ? error.message : 'Požadavek se nepodařilo zpracovat.' }); }
 }
@@ -141,7 +141,7 @@ async function handleFamilyDataRequest(request, response) {
     const context = await getAuthenticatedContext(request); if (!context) { sendJson(response, 401, { error: 'Přihlášení je vyžadováno.' }); return; }
     const familyDataFile = path.join(HOUSEHOLDS_DIRECTORY, `${context.household.id}.json`);
     if (request.method === 'GET') { const familyData = await readJsonFile(familyDataFile, null); sendJson(response, familyData ? 200 : 204, familyData || undefined); return; }
-    if (request.method === 'PUT') { const familyData = sanitizeFamilyData(await readRequestBody(request)); if (context.user.role !== 'admin') { const storedData = await readJsonFile(familyDataFile, null); if (!storedData || JSON.stringify(familyData.events) !== JSON.stringify(storedData.events) || JSON.stringify(familyData.members) !== JSON.stringify(storedData.members) || JSON.stringify(familyData.settings) !== JSON.stringify(storedData.settings)) { sendJson(response, 403, { error: 'Tuto změnu může provést pouze správce rodiny.' }); return; } } await writeJsonFile(familyDataFile, familyData); sendJson(response, 200, { saved: true }); return; }
+    if (request.method === 'PUT') { const familyData = sanitizeFamilyData(await readRequestBody(request)); if (context.user.role !== 'admin') { const storedData = await readJsonFile(familyDataFile, null); const storedTasks = storedData && Array.isArray(storedData.tasks) ? storedData.tasks : []; const incomingTasks = new Map(familyData.tasks.map((task) => [task.id, task])); const unauthorizedTaskChange = storedTasks.some((storedTask) => { const incomingTask = incomingTasks.get(storedTask.id); const isCreator = storedTask.createdByUserId === context.user.id; const isAssignee = Boolean(context.user.memberId) && storedTask.member === context.user.memberId; if (!incomingTask) return !isCreator; const taskStructureUnchanged = storedTask.title === incomingTask.title && storedTask.member === incomingTask.member && storedTask.dueDate === incomingTask.dueDate && storedTask.createdByUserId === incomingTask.createdByUserId; return !taskStructureUnchanged || (storedTask.completed !== incomingTask.completed && !isCreator && !isAssignee); }); const unauthorizedTaskCreation = familyData.tasks.some((task) => !storedTasks.some((storedTask) => storedTask.id === task.id) && task.createdByUserId !== context.user.id); if (!storedData || JSON.stringify(familyData.events) !== JSON.stringify(storedData.events) || JSON.stringify(familyData.members) !== JSON.stringify(storedData.members) || JSON.stringify(familyData.settings) !== JSON.stringify(storedData.settings) || unauthorizedTaskChange || unauthorizedTaskCreation) { sendJson(response, 403, { error: 'Tuto změnu úkolu může provést pouze jeho autor nebo přiřazený člen.' }); return; } } await writeJsonFile(familyDataFile, familyData); sendJson(response, 200, { saved: true }); return; }
     sendJson(response, 405, { error: 'Nepodporovaná metoda.' }, { Allow: 'GET, PUT' });
   } catch (error) { sendJson(response, error.statusCode || 500, { error: error.statusCode ? error.message : 'Rodinná data se nepodařilo zpracovat.' }); }
 }
@@ -153,6 +153,20 @@ async function handleInvitationRequest(request, response) {
     const authData = await readJsonFile(AUTH_DATA_FILE, { users: [], households: [], invitations: [] }); authData.invitations ||= []; const existingUser = authData.users.find((user) => user.householdId === context.household.id && user.memberId === memberId); if (existingUser) { sendJson(response, 409, { error: 'Tento člen už má vlastní přístup.' }); return; }
     authData.invitations = authData.invitations.filter((invitation) => invitation.usedAt || new Date(invitation.expiresAt) > new Date()); const token = crypto.randomBytes(24).toString('base64url'); const expiresAt = new Date(Date.now() + 7 * 86400000).toISOString(); authData.invitations.push({ token, householdId: context.household.id, memberId, createdBy: context.user.id, expiresAt }); await writeJsonFile(AUTH_DATA_FILE, authData); sendJson(response, 201, { token, expiresAt });
   } catch (error) { sendJson(response, error.statusCode || 500, { error: error.statusCode ? error.message : 'Pozvánku se nepodařilo vytvořit.' }); }
+}
+
+async function handleInvitationInfoRequest(request, response, token) {
+  if (request.method !== 'GET' || !token) { sendJson(response, 404, { error: 'Pozvánka nebyla nalezena.' }); return; }
+  try {
+    const authData = await readJsonFile(AUTH_DATA_FILE, { users: [], households: [], invitations: [] });
+    const invitation = (authData.invitations || []).find((item) => item.token === token && !item.usedAt && new Date(item.expiresAt) > new Date());
+    if (!invitation) { sendJson(response, 404, { error: 'Pozvánka je neplatná nebo vypršela.' }); return; }
+    const household = authData.households.find((item) => item.id === invitation.householdId);
+    const familyData = await readJsonFile(path.join(HOUSEHOLDS_DIRECTORY, `${invitation.householdId}.json`), null);
+    const member = familyData && familyData.members && familyData.members[invitation.memberId];
+    if (!household || !member) { sendJson(response, 404, { error: 'Pozvánka nebyla nalezena.' }); return; }
+    sendJson(response, 200, { householdName: household.name, memberName: member.name });
+  } catch { sendJson(response, 500, { error: 'Pozvánku se nepodařilo načíst.' }); }
 }
 
 function escapeCalendarText(value) { return String(value || '').replace(/\\/g, '\\\\').replace(/\r?\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;'); }
@@ -173,6 +187,7 @@ function createServer() {
     response.setHeader('Referrer-Policy', 'same-origin'); response.setHeader('X-Frame-Options', 'DENY'); response.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()'); response.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.open-meteo.com https://geocoding-api.open-meteo.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
     if (requestUrl.pathname.startsWith('/api/auth/')) { handleAuthRequest(request, response, requestUrl.pathname); return; }
     if (requestUrl.pathname === '/api/invitations') { handleInvitationRequest(request, response); return; }
+    if (requestUrl.pathname === '/api/invitation-info') { handleInvitationInfoRequest(request, response, requestUrl.searchParams.get('token')); return; }
     if (requestUrl.pathname === '/api/family-data') { handleFamilyDataRequest(request, response); return; }
     if (requestUrl.pathname === '/calendar.ics' && request.method === 'GET') { sendCalendarFeed(response, requestUrl.searchParams.get('member'), requestUrl.searchParams.get('token')); return; }
     const requestedPath = requestUrl.pathname === '/' ? '/index.html' : requestUrl.pathname; const normalizedPath = path.normalize(requestedPath).replace(/^(\.\.[/\\])+/, ''); const filePath = path.join(PUBLIC_DIRECTORY, normalizedPath);
