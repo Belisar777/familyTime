@@ -699,6 +699,7 @@ h2 {
 
 .schedule-panel,
 .tasks-panel {
+  min-width: 0;
   padding: 26px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
@@ -708,6 +709,7 @@ h2 {
 
 .section-heading {
   display: flex;
+  min-width: 0;
   align-items: flex-end;
   justify-content: space-between;
   gap: 20px;
@@ -827,6 +829,7 @@ h2 {
 
 .timeline-row__content {
   position: relative;
+  min-width: 0;
   border-top: 1px dashed #e5e3de;
 }
 
@@ -2028,6 +2031,15 @@ h2 {
 
   .section-heading {
     align-items: start;
+    flex-wrap: wrap;
+  }
+
+  .section-heading>div:first-child {
+    min-width: 0;
+  }
+
+  .schedule-panel .section-heading {
+    gap: 10px;
   }
 
   .week-controls button {

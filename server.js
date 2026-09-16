@@ -155,6 +155,25 @@ async function handleInvitationRequest(request, response) {
   } catch (error) { sendJson(response, error.statusCode || 500, { error: error.statusCode ? error.message : 'Pozvánku se nepodařilo vytvořit.' }); }
 }
 
+async function handleAdministratorRequest(request, response) {
+  try {
+    const context = await getAuthenticatedContext(request);
+    if (!context) { sendJson(response, 401, { error: 'Přihlášení je vyžadováno.' }); return; }
+    if (context.user.role !== 'admin') { sendJson(response, 403, { error: 'Správce může přidávat pouze jiný správce.' }); return; }
+    if (request.method !== 'POST') { sendJson(response, 405, { error: 'Nepodporovaná metoda.' }, { Allow: 'POST' }); return; }
+    const body = await readRequestBody(request);
+    const memberId = String(body.memberId || '');
+    const familyData = await readJsonFile(path.join(HOUSEHOLDS_DIRECTORY, `${context.household.id}.json`), null);
+    if (!familyData || !familyData.members || !familyData.members[memberId]) { sendJson(response, 404, { error: 'Člen rodiny nebyl nalezen.' }); return; }
+    const authData = await readJsonFile(AUTH_DATA_FILE, { users: [], households: [], invitations: [] });
+    const targetUser = authData.users.find((user) => user.householdId === context.household.id && user.memberId === memberId);
+    if (!targetUser) { sendJson(response, 409, { error: 'Tento člen ještě nemá vlastní přístup.' }); return; }
+    targetUser.role = 'admin';
+    await writeJsonFile(AUTH_DATA_FILE, authData);
+    sendJson(response, 200, { promoted: true });
+  } catch (error) { sendJson(response, error.statusCode || 500, { error: error.statusCode ? error.message : 'Člena se nepodařilo povýšit.' }); }
+}
+
 async function handleInvitationInfoRequest(request, response, token) {
   if (request.method !== 'GET' || !token) { sendJson(response, 404, { error: 'Pozvánka nebyla nalezena.' }); return; }
   try {
@@ -187,6 +206,7 @@ function createServer() {
     response.setHeader('Referrer-Policy', 'same-origin'); response.setHeader('X-Frame-Options', 'DENY'); response.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()'); response.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.open-meteo.com https://geocoding-api.open-meteo.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
     if (requestUrl.pathname.startsWith('/api/auth/')) { handleAuthRequest(request, response, requestUrl.pathname); return; }
     if (requestUrl.pathname === '/api/invitations') { handleInvitationRequest(request, response); return; }
+    if (requestUrl.pathname === '/api/administrators') { handleAdministratorRequest(request, response); return; }
     if (requestUrl.pathname === '/api/invitation-info') { handleInvitationInfoRequest(request, response, requestUrl.searchParams.get('token')); return; }
     if (requestUrl.pathname === '/api/family-data') { handleFamilyDataRequest(request, response); return; }
     if (requestUrl.pathname === '/calendar.ics' && request.method === 'GET') { sendCalendarFeed(response, requestUrl.searchParams.get('member'), requestUrl.searchParams.get('token')); return; }

@@ -103,6 +103,13 @@ test('registruje domácnost, ukládá data a poskytuje kalendář', async () => 
   const forbiddenSave = await fetch(`${baseUrl}/api/family-data`, { method: 'PUT', headers: { Cookie: memberCookie, 'Content-Type': 'application/json' }, body: JSON.stringify(memberData) });
   assert.equal(forbiddenSave.status, 403);
 
+  const memberPromotionAttempt = await fetch(`${baseUrl}/api/administrators`, { method: 'POST', headers: { Cookie: memberCookie, 'Content-Type': 'application/json' }, body: JSON.stringify({ memberId: 'jan' }) });
+  assert.equal(memberPromotionAttempt.status, 403);
+  const promotion = await fetch(`${baseUrl}/api/administrators`, { method: 'POST', headers: { Cookie: cookie, 'Content-Type': 'application/json' }, body: JSON.stringify({ memberId: 'jan' }) });
+  assert.equal(promotion.status, 200);
+  const promotedStatus = await fetch(`${baseUrl}/api/auth/status`, { headers: { Cookie: memberCookie } });
+  assert.equal((await promotedStatus.json()).user.role, 'admin');
+
   const calendarResponse = await fetch(`${baseUrl}/calendar.ics?member=all&token=${registrationData.calendarToken}`);
   assert.equal(calendarResponse.status, 200);
   const calendar = await calendarResponse.text();
