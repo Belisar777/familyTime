@@ -759,6 +759,7 @@ h2 {
   color: var(--muted-color);
   font-size: 11px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .member-chip:first-child {
@@ -2043,11 +2044,45 @@ h2 {
   }
 
   .week-controls button {
-    padding-inline: 9px;
+    min-height: 44px;
+    padding-inline: 14px;
   }
 
   .week-controls #current-week {
+    display: block;
+    flex: 1;
+  }
+
+  .schedule-panel .week-controls {
+    width: 100%;
+  }
+
+  .schedule-panel .week-controls button {
+    min-width: 48px;
+  }
+
+  .member-chip {
+    min-height: 40px;
+    width: 40px;
+    justify-content: center;
+    gap: 0;
+    padding: 3px;
+    font-size: 12px;
+  }
+
+  .member-chip__name {
     display: none;
+  }
+
+  .member-chip .avatar {
+    width: 30px;
+    height: 30px;
+    font-size: 10px;
+  }
+
+  .member-chip:first-child {
+    width: auto;
+    padding: 3px 12px;
   }
 
   .week-strip {
